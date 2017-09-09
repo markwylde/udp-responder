@@ -33,6 +33,10 @@ class UdpResponder {
   constructor (options = {}) {
     this.options = Object.assign({}, defaultOptions, options)
 
+    if (this.options.secret === 'CHANGEME') {
+      console.warn('The `secret` property is still set to the default of `${this.options.secret}` and is therefore insecure.')
+    }
+
     this._eventEmitter = new UdpResponderEmitter()
 
     this._listener = udp.createSocket({type: 'udp4', reuseAddr: true})

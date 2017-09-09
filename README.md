@@ -5,13 +5,13 @@ It can validate a message was sent untampered at a certain time by using SHA256 
 
 The `UdpResponder` class can take the following options
 
-Property       | Description                                           | Type                | Required | Default
----------------|-------------------------------------------------------|---------------------|----------|------------
-multicast_addr | The address the UDP command receiver will listen on   | string              | false    | 224.1.1.1
-port           | The port the UDP command receiver will listen on      | number              | false    | 6811
-secure         | Whether to sign and/or encrypt messages sent/received | none, sign, encrypt | false    | sign
-secret         | If using secure specify the sha256 signature secret   | string              | false    | CHANGEME
-ttl            | If using secure the time until a message expires      | integer             | false    | 5000
+Property       | Description                                           | Type    | Required | Default
+---------------|-------------------------------------------------------|---------|----------|------------
+multicast_addr | The address the UDP command receiver will listen on   | string  | false    | 224.1.1.1
+port           | The port the UDP command receiver will listen on      | number  | false    | 6811
+secure         | Whether to validate the signature of messages         | boolean | false    | true
+secret         | If using secure specify the sha256 signature secret   | string  | false    | CHANGEME
+ttl            | If using secure the time until a message expires      | integer | false    | 5000
 
 ## Properties and Methods
 The `UdpResponder` class exposes the following methods and properties.
@@ -65,14 +65,6 @@ Broadcast a message over the network. You must specify a command but data is opt
 ## Security
 There is a `secure` option that can be set when creating a new instance. It accepts the following options.
 
-| Description                         | None               | Sign               | Encrypt            |
-|-------------------------------------|--------------------|--------------------|--------------------|
-| Accept receiving unsigned messages  | :white_check_mark: | :x:                | :x:                |
-| Accept receiving signed messages    | :x:                | :white_check_mark: | :white_check_mark: |
-| Accept receiving encrypted messages | :x:                | :white_check_mark: | :white_check_mark: |
-| Messages sent will be signed        | :x:                | :white_check_mark: | :white_check_mark: |
-| Messages sent will be encrypted     | :x:                | :x:                | :white_check_mark: |
-
 ## Errors
 Errors are returned as an instance of `UdpResponderError`.
 
@@ -80,7 +72,6 @@ Errors are returned as an instance of `UdpResponderError`.
 ---------------------|-----------|--------------------------------------------------------------------------------|
 | COMMAND_EMPTY      | Outgoing  | You must specify a command when sending a message                              |
 | INVALID_SIGNATURE  | Incoming  | Message received but had invalid signature.                                    |
-| INVALID_ENCRYPTION | Incoming  | Message received but could not be encrypted probably due to an invalid secret. |
 | EXPIRED            | Incoming  | Message received but expired ? milliseconds ago.                               |
 | INVALID_DATA_TYPE  | Incoming  | Message received with invalid ? content and could not be parsed.               |
 | UNKNOWN_DATA_TYPE  | Either    | Message received but the data type of ? is unimplemented.                      |
