@@ -60,33 +60,18 @@ Start listening for messages on the network
 Stop listening for messages on the network
 
 ### UdpResponder::broadcast(cmd:string, data:any)
-Broadcast a message on the network. You must specify a command but data is optional.
+Broadcast a message over the network. You must specify a command but data is optional.
 
 ## Security
 There is a `secure` option that can be set when creating a new instance. It accepts the following options.
-### none
-- :white_check_mark: Accept receiving unsigned messages
-- :x: Accept receiving signed messages
-- :x: Accept receiving encrypted messages
-- :white_check_mark: Messages sent will be unsigned and not encrypted
-- :x: Messages sent will be signed but not encrypted
-- :x: Messages sent will be signed and encrypted
 
-### sign
-- :x: Accept receiving unsigned messages
-- :white_check_mark: Accept receiving signed messages
-- :white_check_mark: Accept receiving encrypted messages
-- :x: Messages sent will be unsigned and not encrypted
-- :white_check_mark: Messages sent will be signed but not encrypted
-- :x: Messages sent will be signed and encrypted
-
-### encrypt
-- :x: Accept receiving unsigned messages
-- :x: Accept receiving signed messages
-- :white_check_mark: Accept receiving encrypted messages
-- :x: Messages sent will be unsigned and not encrypted
-- :x: Messages sent will be signed but not encrypted
-- :white_check_mark: Messages sent will be signed and encrypted
+| Description                         | None               | Sign               | Encrypt            |
+|-------------------------------------|--------------------|--------------------|--------------------|
+| Accept receiving unsigned messages  | :white_check_mark: | :x:                | :x:                |
+| Accept receiving signed messages    | :x:                | :white_check_mark: | :white_check_mark: |
+| Accept receiving encrypted messages | :x:                | :white_check_mark: | :white_check_mark: |
+| Messages sent will be signed        | :x:                | :white_check_mark: | :white_check_mark: |
+| Messages sent will be encrypted     | :x:                | :x:                | :white_check_mark: |
 
 ## Errors
 Errors are returned as an instance of `UdpResponderError`.
