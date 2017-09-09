@@ -45,7 +45,12 @@ class UdpResponder {
     this.options = Object.assign({}, defaultOptions, options)
 
     if (this.options.secret === 'CHANGEME') {
-      console.warn('The `secret` property is still set to the default of `${this.options.secret}` and is therefore insecure.')
+      console.warn('\x1b[33m%s\x1b[0m', [
+        '-----------------------------------------------------------------------------------------------------------',
+        'The \`secret\` property is still set to the default of "${this.options.secret}" and is therefore insecure.',
+        'You should change this before moving to production.',
+        '-----------------------------------------------------------------------------------------------------------'
+      ].join('\n'))
     }
 
     this._eventEmitter = new UdpResponderEmitter()
