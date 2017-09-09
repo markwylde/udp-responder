@@ -7,9 +7,20 @@ const crypto = require('crypto')
 const defaultOptions = {
   multicast_addr: '224.1.1.1',
   port: 6811,
-  secure: true,
   ttl: 5000,
   secret: 'CHANGEME'
+}
+
+class UdpResponderRejection extends Error {
+  constructor ({code, message}) {
+    super('UdpResponderRejection\n\n' + message + '\n\n' + JSON.stringify(arguments[0], null, 2))
+
+    Error.captureStackTrace(this, this.constructor);
+    this.name = this.constructor.name;
+
+    this.code = code || 'UNKNOWN'
+    this.message = message || 'No message was provided'
+  }
 }
 
 class UdpResponderError extends Error {
@@ -85,25 +96,23 @@ class UdpResponder {
           value: msg[4]
         }
 
-        if (this.options.secure) {
-          if (msg.signature !== sign(this.options.secret, `${msg.timestamp}|${msg.type}|${msg.value}`)) {
-            throw new UdpResponderError({
-              code: 'INVALID_SIGNATURE',
-              message: 'Message received but had invalid signature.'
-            })
-          }
+        if (msg.signature !== sign(this.options.secret, `${msg.timestamp}|${msg.type}|${msg.value}`)) {
+          throw new UdpResponderRejection({
+            code: 'INVALID_SIGNATURE',
+            message: 'Message received but had invalid signature.'
+          })
+        }
 
-          if (new Date().getTime() - msg.timestamp > this.options.ttl) {
-            const msFromExpired = (new Date().getTime() - msg.timestamp) - this.options.ttl
-            throw new UdpResponderError({
-              code: 'EXPIRED',
-              message: `Message received but expired ${msFromExpired} milliseconds ago.`
-            })
-          }
+        if (new Date().getTime() - msg.timestamp > this.options.ttl) {
+          const msFromExpired = (new Date().getTime() - msg.timestamp) - this.options.ttl
+          throw new UdpResponderRejection({
+            code: 'EXPIRED',
+            message: `Message received but expired ${msFromExpired} milliseconds ago.`
+          })
         }
 
         if (!['text', 'json'].includes(msg.type)) {
-          throw new UdpResponderError({
+          throw new UdpResponderRejection({
             code: 'UNKNOWN_DATA_TYPE',
             message: `Message received but the data type of ${msg.type} is unimplemented.`
           })
@@ -113,7 +122,7 @@ class UdpResponder {
           try {
             msg.value = JSON.parse(msg.value)
           } catch (err) {
-            throw new UdpResponderError({
+            throw new UdpResponderRejection({
               code: 'INVALID_DATA_TYPE',
               message: `Message received with invalid JSON content and could not be parsed.`
             })
@@ -128,8 +137,8 @@ class UdpResponder {
           } else {
             throw err
           }
-        } else {
-          throw err
+        } else if (err.constructor.name === 'UdpResponderRejection') {
+          this._eventEmitter.emit('error', err, msg, sender)
         }
       }
     })
