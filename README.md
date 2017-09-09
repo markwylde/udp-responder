@@ -1,5 +1,7 @@
 # Udp Responder
-This library lets you broadcast and listen to messages on a network through UDP
+This library lets you broadcast and listen to messages on a network through UDP.
+
+It can validate a message was sent untampered at a certain time by using SHA256 hashing.
 
 ## How to use
 The library is a class and therefore should be used to create a new object 
@@ -7,13 +9,13 @@ The library is a class and therefore should be used to create a new object
 ### UdpResponder
 The `UdpResponder` class can take the following options
 
-Property       | Description                                         | Required |  Default
----------------|-----------------------------------------------------|----------|-----------
-multicast_addr | The address the UDP command receiver will listen on | false    |  224.1.1.1
-port           | The port the UDP command receiver will listen on    | false    |  6811
-secure         | Require a valid hash before continuing              | false    |  true
-secret         | If using secure specify the sha256 signature secret | false    |  CHANGEME
-ttl            | If using secure the time until a message expires    | false    |  5000
+Property       | Description                                           | Type                | Required | Default
+---------------|-------------------------------------------------------|---------------------|----------|------------
+multicast_addr | The address the UDP command receiver will listen on   | string              | false    | 224.1.1.1
+port           | The port the UDP command receiver will listen on      | number              | false    | 6811
+secure         | Whether to sign and/or encrypt messages sent/received | none, sign, encrypt | false    | sign
+secret         | If using secure specify the sha256 signature secret   | string              | false    | CHANGEME
+ttl            | If using secure the time until a message expires      | integer             | false    | 5000
 
 The `UdpResponder` class exposes the following methods and properties.
 
@@ -53,16 +55,44 @@ udpResponder.on('error', function (error, cmd, data, sender) {
 })
 ```
 
+#### Security
+There is a secure option that can be set when creating a new instance. It accepts the following options.
+##### none
+- :white_check_mark: Accept receiving unsigned messages
+- :x: Accept receiving signed messages
+- :x: Accept receiving encrypted messages
+- :white_check_mark: Messages send will be unsigned and unencrypted
+- :x: Messages send will be signed but unencrypted
+- :x: Messages send will be signed and encrypted
+
+##### sign
+- :x: Accept receiving unsigned messages
+- :white_check_mark: Accept receiving signed messages
+- :white_check_mark: Accept receiving encrypted messages
+- :x: Messages send will be unsigned and unencrypted
+- :white_check_mark: Messages send will be signed but unencrypted
+- :x: Messages send will be signed and encrypted
+
+##### encrypt
+- :x: Accept receiving unsigned messages
+- :x: Accept receiving signed messages
+- :white_check_mark: Accept receiving encrypted messages
+- :x: Messages send will be unsigned and unencrypted
+- :x: Messages send will be signed but unencrypted
+- :white_check_mark: Messages send will be signed and encrypted
+
+
 #### Errors
 Errors are returned as an instance of `UdpResponderError`.
 
-| Error             | Direction | Description                                                         |
---------------------|-----------|---------------------------------------------------------------------|
-| COMMAND_EMPTY     | Outgoing  | You must specify a command when sending a message                   |
-| INVALID_SIGNATURE | Incoming  | Message received but had invalid signature.                         |
-| EXPIRED           | Incoming  | Message received but expired ? milliseconds ago.                    |
-| INVALID_DATA_TYPE | Incoming  | Message received with invalid ? content and could not be parsed.    |
-| UNKNOWN_DATA_TYPE | Either    | Message received but the data type of ? is unimplemented.           |
+| Error              | Direction | Description                                                                    |
+---------------------|-----------|--------------------------------------------------------------------------------|
+| COMMAND_EMPTY      | Outgoing  | You must specify a command when sending a message                              |
+| INVALID_SIGNATURE  | Incoming  | Message received but had invalid signature.                                    |
+| INVALID_ENCRYPTION | Incoming  | Message received but could not be encrypted probably due to an invalid secret. |
+| EXPIRED            | Incoming  | Message received but expired ? milliseconds ago.                               |
+| INVALID_DATA_TYPE  | Incoming  | Message received with invalid ? content and could not be parsed.               |
+| UNKNOWN_DATA_TYPE  | Either    | Message received but the data type of ? is unimplemented.                      |
 
 #### UdpResponder::open()
 Start listening for messages on the network
