@@ -3,10 +3,6 @@ This library lets you broadcast and listen to messages on a network through UDP.
 
 It can validate a message was sent untampered at a certain time by using SHA256 hashing.
 
-## How to use
-The library is a class and therefore should be used to create a new object 
-
-### UdpResponder
 The `UdpResponder` class can take the following options
 
 Property       | Description                                           | Type                | Required | Default
@@ -17,27 +13,28 @@ secure         | Whether to sign and/or encrypt messages sent/received | none, s
 secret         | If using secure specify the sha256 signature secret   | string              | false    | CHANGEME
 ttl            | If using secure the time until a message expires      | integer             | false    | 5000
 
+## Properties and Methods
 The `UdpResponder` class exposes the following methods and properties.
 
-#### UdpResponder::on(event:string, fn:function)
+### UdpResponder::on(event:string, fn:function)
 Add an event listener. The following events can occur.
 
-##### opened
+#### opened
 ```javascript
 udpResponder.on('opened', function () {
   console.log('The sender and listener have been opened')
 })
 ```
 
-##### closed
+#### closed
 ```javascript
 udpResponder.on('closed', function () {
   console.log('The sender and listener have been closed')
 })
 ```
 
-##### message
-When a message is received it will have a command and possible some data.
+#### message
+When a message is received it will have a command, possibly some data and information about the sender.
 
 The sender is "Remote address information" provided as `rinfo` from the node API.
 [https://nodejs.org/api/dgram.html#dgram_event_message](https://nodejs.org/api/dgram.html#dgram_event_message)
@@ -48,16 +45,26 @@ udpResponder.on('message', function (cmd, data, sender) {
 })
 ```
 
-##### error
+#### error
+See the errors section below for a list of possible error messages
 ```javascript
 udpResponder.on('error', function (error, cmd, data, sender) {
   console.log(`An error occured:`, err)
 })
 ```
 
-#### Security Level
+### UdpResponder::open()
+Start listening for messages on the network
+
+### UdpResponder::close()
+Stop listening for messages on the network
+
+### UdpResponder::broadcast(cmd:string, data:any)
+Broadcast a message on the network. You must specify a command but data is optional.
+
+## Security
 There is a `secure` option that can be set when creating a new instance. It accepts the following options.
-##### none
+### none
 - :white_check_mark: Accept receiving unsigned messages
 - :x: Accept receiving signed messages
 - :x: Accept receiving encrypted messages
@@ -65,7 +72,7 @@ There is a `secure` option that can be set when creating a new instance. It acce
 - :x: Messages sent will be signed but not encrypted
 - :x: Messages sent will be signed and encrypted
 
-##### sign
+### sign
 - :x: Accept receiving unsigned messages
 - :white_check_mark: Accept receiving signed messages
 - :white_check_mark: Accept receiving encrypted messages
@@ -73,7 +80,7 @@ There is a `secure` option that can be set when creating a new instance. It acce
 - :white_check_mark: Messages sent will be signed but not encrypted
 - :x: Messages sent will be signed and encrypted
 
-##### encrypt
+### encrypt
 - :x: Accept receiving unsigned messages
 - :x: Accept receiving signed messages
 - :white_check_mark: Accept receiving encrypted messages
@@ -81,8 +88,7 @@ There is a `secure` option that can be set when creating a new instance. It acce
 - :x: Messages sent will be signed but not encrypted
 - :white_check_mark: Messages sent will be signed and encrypted
 
-
-#### Errors
+## Errors
 Errors are returned as an instance of `UdpResponderError`.
 
 | Code               | Direction | Description                                                                    |
@@ -93,15 +99,6 @@ Errors are returned as an instance of `UdpResponderError`.
 | EXPIRED            | Incoming  | Message received but expired ? milliseconds ago.                               |
 | INVALID_DATA_TYPE  | Incoming  | Message received with invalid ? content and could not be parsed.               |
 | UNKNOWN_DATA_TYPE  | Either    | Message received but the data type of ? is unimplemented.                      |
-
-#### UdpResponder::open()
-Start listening for messages on the network
-
-#### UdpResponder::close()
-Stop listening for messages on the network
-
-#### UdpResponder::broadcast(cmd:string, data:any)
-Broadcast a message on the network. You must specify a command but data is optional.
 
 ## Example
 ```javascript
@@ -126,6 +123,6 @@ udpResponder.on('message', async function (msg, sender) {
 
 udpResponder.open()
 
-// You can stop broadcasting by calling destroy
+// You can stop everything by calling close
 // udpResponder.close()
 ```
