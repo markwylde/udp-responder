@@ -55,37 +55,37 @@ udpResponder.on('error', function (error, cmd, data, sender) {
 })
 ```
 
-#### Security
-There is a secure option that can be set when creating a new instance. It accepts the following options.
+#### Security Level
+There is a `secure` option that can be set when creating a new instance. It accepts the following options.
 ##### none
 - :white_check_mark: Accept receiving unsigned messages
 - :x: Accept receiving signed messages
 - :x: Accept receiving encrypted messages
-- :white_check_mark: Messages send will be unsigned and unencrypted
-- :x: Messages send will be signed but unencrypted
-- :x: Messages send will be signed and encrypted
+- :white_check_mark: Messages sent will be unsigned and not encrypted
+- :x: Messages sent will be signed but not encrypted
+- :x: Messages sent will be signed and encrypted
 
 ##### sign
 - :x: Accept receiving unsigned messages
 - :white_check_mark: Accept receiving signed messages
 - :white_check_mark: Accept receiving encrypted messages
-- :x: Messages send will be unsigned and unencrypted
-- :white_check_mark: Messages send will be signed but unencrypted
-- :x: Messages send will be signed and encrypted
+- :x: Messages sent will be unsigned and not encrypted
+- :white_check_mark: Messages sent will be signed but not encrypted
+- :x: Messages sent will be signed and encrypted
 
 ##### encrypt
 - :x: Accept receiving unsigned messages
 - :x: Accept receiving signed messages
 - :white_check_mark: Accept receiving encrypted messages
-- :x: Messages send will be unsigned and unencrypted
-- :x: Messages send will be signed but unencrypted
-- :white_check_mark: Messages send will be signed and encrypted
+- :x: Messages sent will be unsigned and not encrypted
+- :x: Messages sent will be signed but not encrypted
+- :white_check_mark: Messages sent will be signed and encrypted
 
 
 #### Errors
 Errors are returned as an instance of `UdpResponderError`.
 
-| Error              | Direction | Description                                                                    |
+| Code               | Direction | Description                                                                    |
 ---------------------|-----------|--------------------------------------------------------------------------------|
 | COMMAND_EMPTY      | Outgoing  | You must specify a command when sending a message                              |
 | INVALID_SIGNATURE  | Incoming  | Message received but had invalid signature.                                    |
