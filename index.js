@@ -47,7 +47,7 @@ class UdpResponder {
     if (this.options.secret === 'CHANGEME') {
       console.warn('\x1b[33m%s\x1b[0m', [
         '-----------------------------------------------------------------------------------------------------------',
-        'The \`secret\` property is still set to the default of "${this.options.secret}" and is therefore insecure.',
+        `The \`secret\` property is still set to the default of "${this.options.secret}" and is therefore insecure.`,
         'You should change this before moving to production.',
         '-----------------------------------------------------------------------------------------------------------'
       ].join('\n'))
@@ -69,7 +69,7 @@ class UdpResponder {
 
     const type = (data instanceof Object ? 'json' : 'text')
     if (type === 'json') {
-      data = JSON.stringify(data)  
+      data = JSON.stringify(data)
     }
 
     const signedDate = `${new Date().getTime()}|${type}|${data}`
