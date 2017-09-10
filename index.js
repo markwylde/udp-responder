@@ -72,8 +72,8 @@ class UdpResponder {
       data = JSON.stringify(data)
     }
 
-    const signedDate = `${new Date().getTime()}|${type}|${data}`
-    data = `${cmd}|${sign(this.options.secret, signedDate)}|${signedDate}`
+    const signedData = `${new Date().getTime()}|${type}|${data}`
+    data = `${cmd}|${sign(this.options.secret, signedData)}|${signedData}`
 
     this._sender.send(data, 0, data.length, port || this.options.port, addr || this.options.multicast_addr)
   }
